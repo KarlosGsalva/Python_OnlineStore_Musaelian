@@ -4,6 +4,10 @@ from .models import Cart
 from .models import Product
 
 
+from django.http import HttpResponse
+from django.template import loader
+
+
 def product_list(request):
     products = Product.objects.all()
     return render(request, 'product_list.html', {'products': products})

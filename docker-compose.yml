@@ -12,8 +12,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    networks:
-      - backend_os
 
   postgres:
     image: postgres:16.3-alpine
@@ -33,12 +31,6 @@ services:
       retries: 3
     ports:
       - "5439:5432"
-    networks:
-      - backend_os
 
 volumes:
-  pg_data_onlinestore:
-
-networks:
-  backend_os:
-    driver: bridge
+  pg_data_onlinestore: { }
