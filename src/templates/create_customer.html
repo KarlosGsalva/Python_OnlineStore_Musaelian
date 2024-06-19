@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add to Cart</title>
+    <title>Create Customer</title>
 </head>
 <body>
-    <h1>Добавить в корзину</h1>
-    <form method="post" action="{% url 'add_to_cart' %}">
+    <h1>Create Customer</h1>
+    <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Добавить в корзину">
+        <input type="submit" value="Create Customer">
     </form>
 </body>
 </html>
