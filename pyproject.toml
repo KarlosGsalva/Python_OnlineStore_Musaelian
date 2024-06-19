@@ -17,6 +17,8 @@ psycopg = "^3.1.19"
 psycopg-binary = "^3.1.19"
 psycopg-pool = "^3.2.2"
 pillow = "^10.3.0"
+django-admin-interface = "^0.28.6"
+django-colorfield = "^0.11.0"
 
 
 [build-system]

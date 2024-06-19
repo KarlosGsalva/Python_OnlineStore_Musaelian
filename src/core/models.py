@@ -1,9 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
-
-
-class User(AbstractUser):
-    pass
 
 
 class Customer(models.Model):
@@ -27,6 +22,7 @@ class Product(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to='products/')
+    category = models.ForeignKey('Category', on_delete=models.PROTECT, null=True)
 
     class Meta:
         db_table = "products"
@@ -79,3 +75,12 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.id} by {self.customer.first_name}"
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = "categories"
+        verbose_name = "categories"
+        verbose_name_plural = "categories"
