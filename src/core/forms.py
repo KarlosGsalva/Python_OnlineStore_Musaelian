@@ -2,16 +2,16 @@ from django import forms
 from .models import Customer, Product, Stock, Cart, Order, Category
 
 
-class CartForm(forms.Form):
-    product = forms.ModelChoiceField(queryset=Product.objects.all())
-    quantity = forms.IntegerField(min_value=1)
+class CartForm(forms.ModelForm):
+    class Meta:
+        model = Cart
+        fields = ["customer", "product", "quantity"]
 
 
-class OrderForm(forms.Form):
-    name = forms.CharField(max_length=100)
-    address = forms.CharField(max_length=255)
-    email = forms.EmailField()
-    cart = forms.ModelChoiceField(queryset=Cart.objects.all())
+class OrderForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ["customer", "product", "quantity", "status"]
 
 
 class CustomerForm(forms.ModelForm):

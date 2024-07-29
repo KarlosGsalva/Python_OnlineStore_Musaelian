@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from .forms import CartForm, CustomerForm
-from .models import Cart, Product
+from .models import Cart, Product, Customer
 
 
 def home_view(request):
@@ -27,9 +27,12 @@ def add_to_cart(request):
         if form.is_valid():
             product = form.cleaned_data['product']
             quantity = form.cleaned_data['quantity']
-            cart, created = Cart.objects.get_or_create(user=request.user)
-            cart.add_item(product, quantity)
+            cart, created = Cart.objects.get_or_create(customer=request.user.customer)
+            cart.product = product
+            cart.quantity = quantity
+            cart.save()
             return redirect('cart')
+            # Перенаправление на страницу корзины после добавления товара
     else:
         form = CartForm()
     return render(request, 'add_to_cart.html', {'form': form})
@@ -41,9 +44,23 @@ def create_customer(request):
         if form.is_valid():
             form.save()
             return redirect('customer_list')
+            # Перенаправление на список клиентов после создания
     else:
         form = CustomerForm()
     return render(request, 'create_customer.html', {'form': form})
+
+
+def edit_customer(request, pk):
+    customer = get_object_or_404(Customer, pk=pk)
+    if request.method == 'POST':
+        form = CustomerForm(request.POST, instance=customer)
+        if form.is_valid():
+            form.save()
+            return redirect('customer_list')
+            # Перенаправление на список клиентов после редактирования
+    else:
+        form = CustomerForm(instance=customer)
+    return render(request, 'customer_form.html', {'form': form})
 
 
 def register(request):
@@ -55,4 +72,4 @@ def register(request):
             return redirect('home')
     else:
         form = UserCreationForm()
-    return render(request, 'registration/register.html', {'form': form})
+    return render(request, 'register.html', {'form': form})

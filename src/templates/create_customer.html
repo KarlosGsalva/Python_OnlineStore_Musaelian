@@ -1,16 +1,17 @@
+<!-- templates/customer_form.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Customer</title>
+    <title>Customer Form</title>
 </head>
 <body>
-    <h1>Create Customer</h1>
+    <h1>{{ form.instance.pk|default:"Create" }} Customer</h1>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Create Customer">
+        <button type="submit">Save</button>
     </form>
 </body>
 </html>

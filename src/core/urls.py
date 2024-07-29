@@ -1,6 +1,14 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path
-from .views import product_list, add_to_cart, product_detail, create_customer, register, home_view
+from .views import (
+    product_list,
+    add_to_cart,
+    product_detail,
+    create_customer,
+    register,
+    home_view,
+    edit_customer
+)
 
 urlpatterns = [
     path('', home_view, name='home'),
@@ -10,6 +18,7 @@ urlpatterns = [
     path('products/', product_list, name='product_list'),
     path('add_to_cart/', add_to_cart, name='add_to_cart'),
     path('product/<int:pk>/', product_detail, name='product_detail'),
-    path('create_customer/', create_customer, name='create_customer'),
+    path('customers/create/', create_customer, name='create_customer'),
+    path('customers/<int:pk>/edit/', edit_customer, name='edit_customer'),
     path('register/', register, name='register'),
 ]
