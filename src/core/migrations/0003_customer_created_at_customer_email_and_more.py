@@ -73,7 +73,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='product',
             name='image',
-            field=models.ImageField(upload_to='products_images/'),
+            field=models.ImageField(upload_to='product_images/'),
         ),
         migrations.AlterField(
             model_name='product',
