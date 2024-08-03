@@ -1,6 +1,7 @@
+from django.contrib.auth.hashers import make_password
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
-from .forms import CartForm, CustomerForm, RegisterForm
+from .forms import CartForm, CustomerForm, CustomerRegistrationForm
 from .models import Cart, Product, Customer
 
 
@@ -63,14 +64,15 @@ def edit_customer(request, pk):
 
 def register(request):
     if request.method == 'POST':
-        form = RegisterForm(request.POST)
+        form = CustomerRegistrationForm(request.POST)
         if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=password)
-            login(request, user)
-            return redirect('/')
+            customer = form.save()
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(request, email=customer.email, password=raw_password)
+            if user is not None:
+                login(request, user)
+                return redirect('home')
     else:
-        form = RegisterForm()
+        form = CustomerRegistrationForm()
     return render(request, 'register.html', {'form': form})
+

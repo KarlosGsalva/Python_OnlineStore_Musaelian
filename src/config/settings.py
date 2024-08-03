@@ -79,7 +79,9 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = ['*']
 
-AUTH_USER_MODEL = "users.User"
+AUTH_USER_MODEL = "core.Customer"
+
+AUTHENTICATION_BACKENDS = ['core.authentication.EmailBackend', 'django.contrib.auth.backends.ModelBackend']
 
 # Application definition
 
