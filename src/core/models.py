@@ -8,7 +8,6 @@ class Customer(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=50, null=True, blank=True)
     last_name = models.CharField(max_length=50, null=True, blank=True)
-    patronymic = models.CharField(max_length=50, null=True)
     email = models.EmailField(max_length=50, unique=True, null=True, blank=True)
     address = models.TextField(null=True, blank=True, help_text="Where can we deliver the goods to you?")
     contact_info = models.TextField(null=True, blank=True, help_text="How can we contact you?")
