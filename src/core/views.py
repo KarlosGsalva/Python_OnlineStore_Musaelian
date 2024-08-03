@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import login
-from .forms import CartForm, CustomerForm
+from django.contrib.auth import login, authenticate
+from .forms import CartForm, CustomerForm, RegisterForm
 from .models import Cart, Product, Customer
 
 
@@ -27,10 +26,9 @@ def add_to_cart(request):
         if form.is_valid():
             product = form.cleaned_data['product']
             quantity = form.cleaned_data['quantity']
-            cart, created = Cart.objects.get_or_create(customer=request.user.customer)
-            cart.product = product
-            cart.quantity = quantity
-            cart.save()
+            customer = Customer.objects.get(id=request.user.id)
+            cart, created = Cart.objects.get_or_create(customer=customer, product=product)
+            cart.add_item(product, quantity)
             return redirect('cart')
             # Перенаправление на страницу корзины после добавления товара
     else:
@@ -65,11 +63,14 @@ def edit_customer(request, pk):
 
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            form.save()
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=password)
             login(request, user)
-            return redirect('home')
+            return redirect('/')
     else:
-        form = UserCreationForm()
+        form = RegisterForm()
     return render(request, 'register.html', {'form': form})

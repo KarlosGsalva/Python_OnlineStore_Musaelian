@@ -3,18 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}My Site{% endblock %}</title>
+    <title>{% block title %} OnlineStore {% endblock %}</title>
 </head>
 <body>
     <header>
-        <h1>My Site</h1>
+        <h1>OnlineStore</h1>
         <nav>
+            <hr>
+                {% if user.is_authenticated %}
+                <p>Hi {{ user.username }}!</p>
+                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="background:none; border:none; color:blue; cursor:pointer;">Log Out</button>
+                </form>
+            {% else %}
+                    <p>You are not logged in</p>
+                    <a href="{% url 'login' %}">Log In</a>
+                {% endif %}
+            <hr>
             <ul>
                 <li><a href="{% url 'home' %}">Home</a></li>
                 <li><a href="{% url 'register' %}">Register</a></li>
-                <li><a href="{% url 'login' %}">Login</a></li>
-                <li><a href="{% url 'logout' %}">Logout</a></li>
                 <li><a href="{% url 'product_list' %}">Products</a></li>
+                <li><a href="{% url 'add_to_cart' %}">Add to cart</a></li>
             </ul>
         </nav>
     </header>
@@ -23,7 +34,7 @@
         {% endblock %}
     </main>
     <footer>
-        <p>&copy; 2023 My Site</p>
+        <p>&copy; 2024 OnlineStore</p>
     </footer>
 </body>
 </html>

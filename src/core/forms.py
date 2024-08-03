@@ -1,17 +1,28 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+
 from .models import Customer, Product, Stock, Cart, Order, Category
 
 
-class CartForm(forms.ModelForm):
-    class Meta:
-        model = Cart
-        fields = ["customer", "product", "quantity"]
+class CartForm(forms.Form):
+    product = forms.ModelChoiceField(queryset=Product.objects.all())
+    quantity = forms.IntegerField()
+
+    # class Meta:
+    #     model = Cart
+    #     fields = ["customer", "product", "quantity"]
 
 
 class OrderForm(forms.ModelForm):
-    class Meta:
-        model = Order
-        fields = ["customer", "product", "quantity", "status"]
+    name = forms.CharField()
+    adress = forms.CharField()
+    email = forms.EmailField()
+    cart = forms.ModelChoiceField(queryset=Cart.objects.all())
+
+    # class Meta:
+    #     model = Order
+    #     fields = ["customer", "product", "quantity", "status"]
 
 
 class CustomerForm(forms.ModelForm):
@@ -36,3 +47,11 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ['name']
+
+
+class RegisterForm(UserCreationForm):
+    email = forms.EmailField(max_length=100, help_text="Required. Enter a valid email address.")
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password1', 'password2')
