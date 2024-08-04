@@ -11,7 +11,7 @@
         <nav>
             <hr>
                 {% if user.is_authenticated %}
-                <p>Hi {{ user.username }}!</p>
+                <p>Hi {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.email }}{% endif %}!</p>
                 <form action="{% url 'logout' %}" method="post" style="display:inline;">
                     {% csrf_token %}
                     <button type="submit" style="background:none; border:none; color:blue; cursor:pointer;">Log Out</button>

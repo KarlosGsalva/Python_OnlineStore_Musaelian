@@ -23,6 +23,8 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
 
+    readonly_fields = ('date_joined',)
+
 
 admin.site.register(Customer, UserAdmin)
 admin.site.unregister(Group)

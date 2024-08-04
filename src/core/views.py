@@ -1,8 +1,14 @@
+import logging
+
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from .forms import CartForm, CustomerForm, CustomerRegistrationForm
 from .models import Cart, Product, Customer
+
+env_logger = logging.getLogger('env_logger')
 
 
 def home_view(request):
@@ -21,19 +27,47 @@ def product_detail(request, pk):
     return render(request, 'product_detail.html', context)
 
 
+@login_required
 def add_to_cart(request):
+    env_logger.debug("Entered add_to_cart view")
+
     if request.method == 'POST':
+        env_logger.debug("Request method is POST")
+
         form = CartForm(request.POST)
         if form.is_valid():
+            env_logger.debug("Form is valid")
+
+            user_email = request.user.email  # используем email текущего пользователя
+            try:
+                customer = Customer.objects.get(email=user_email)  # получаем объект Customer по email
+            except Customer.DoesNotExist:
+                env_logger.error(f"Customer with email {user_email} does not exist")
+                return HttpResponse("Customer not found", status=404)
+
             product = form.cleaned_data['product']
             quantity = form.cleaned_data['quantity']
-            customer = Customer.objects.get(id=request.user.id)
-            cart, created = Cart.objects.get_or_create(customer=customer, product=product)
-            cart.add_item(product, quantity)
-            return redirect('cart')
-            # Перенаправление на страницу корзины после добавления товара
+
+            env_logger.debug(f"Customer: {customer}, Product: {product}, Quantity: {quantity}")
+
+            cart_item, created = Cart.objects.get_or_create(
+                customer=customer,
+                product=product,
+                defaults={'quantity': quantity}
+            )
+            if not created:
+                cart_item.quantity += quantity
+                cart_item.save()
+            env_logger.debug(f"Cart item created: {created}, Quantity after update: {cart_item.quantity}")
+
+            return redirect('add_to_cart')  # замените на ваш URL успешного добавления
+        else:
+            env_logger.error("Form is not valid")
+            env_logger.debug(form.errors)
     else:
+        env_logger.debug("Request method is not POST")
         form = CartForm()
+
     return render(request, 'add_to_cart.html', {'form': form})
 
 
@@ -75,4 +109,3 @@ def register(request):
     else:
         form = CustomerRegistrationForm()
     return render(request, 'register.html', {'form': form})
-

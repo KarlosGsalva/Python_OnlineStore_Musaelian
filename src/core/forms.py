@@ -1,17 +1,16 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
-# from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 
-from .models import Customer, Product, Stock, Cart, Order, Category
+from .models import Customer, Product, Stock, Cart, Category
 
 User = get_user_model()
 
 
 class CartForm(forms.Form):
-    product = forms.ModelChoiceField(queryset=Product.objects.all())
-    quantity = forms.IntegerField()
+    product = forms.ModelChoiceField(queryset=Product.objects.all(), empty_label="Select Product")
+    quantity = forms.IntegerField(min_value=1, error_messages={'required': 'Please enter a quantity',
+                                                               'min_value': 'Quantity must be at least 1'})
 
     # class Meta:
     #     model = Cart
