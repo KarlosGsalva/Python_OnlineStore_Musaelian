@@ -12,6 +12,8 @@
         {% csrf_token %}
         {{ form.as_p }}
         <input type="submit" value="Добавить в корзину">
+        <p><a href="{% url 'place_order' %}">Place order</a></p>
+        <p><a href="{% url 'home' %}">Home</a></p>
     </form>
 </body>
 </html>

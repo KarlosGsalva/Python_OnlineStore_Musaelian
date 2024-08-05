@@ -7,7 +7,9 @@ from .views import (
     create_customer,
     register,
     home_view,
-    edit_customer
+    edit_customer,
+    place_order,
+    order_success
 )
 
 urlpatterns = [
@@ -20,4 +22,6 @@ urlpatterns = [
     path('product/<int:pk>/', product_detail, name='product_detail'),
     path('customers/create/', create_customer, name='create_customer'),
     path('customers/<int:pk>/edit/', edit_customer, name='edit_customer'),
+    path('place_order/', place_order, name='place_order'),
+    path('order_success/', order_success, name='order_success')
 ]

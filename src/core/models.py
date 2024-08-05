@@ -4,6 +4,7 @@ from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.core.exceptions import ValidationError
 from django.db import models
+from django import forms
 
 
 class CustomerManager(BaseUserManager):
@@ -67,10 +68,10 @@ class Customer(AbstractBaseUser, PermissionsMixin):
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
-    description = models.TextField()
+    description = models.TextField(null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.ImageField(upload_to='product_images/')
-    category = models.ForeignKey('Category', on_delete=models.PROTECT, null=True)
+    image = models.ImageField(upload_to='product_images/', null=True, blank=True)
+    category = models.ForeignKey('Category', on_delete=models.PROTECT, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -106,10 +107,19 @@ class Cart(models.Model):
     class Meta:
         db_table = "cart"
         verbose_name = "cart"
-        verbose_name_plural = "cart"
+        verbose_name_plural = "carts"
 
     def __str__(self):
-        return f"{self.customer.first_name}'s cart"
+        return f"{self.customer.first_name or self.customer.email}'s cart"
+
+
+class CartItem(models.Model):
+    cart = models.ForeignKey('Cart', on_delete=models.CASCADE)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name} in cart {self.cart.id}"
 
 
 class Order(models.Model):
@@ -124,10 +134,9 @@ class Order(models.Model):
         COMPLETED = 'CL', 'Completed'  # заказ полностью выполнен и закрыт
 
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     order_date = models.DateTimeField(auto_now_add=True)
-    delivery_date = models.DateTimeField(null=True, blank=True)
+    delivery_datetime = models.DateTimeField(help_text="Date and time of delivery", default='01.01.2025')
     status = models.CharField(
         max_length=8, choices=OrderStatus.choices, default=OrderStatus.PENDING
     )
@@ -138,27 +147,30 @@ class Order(models.Model):
         verbose_name_plural = "orders"
 
     def __str__(self):
-        return f"Order {self.id} by {self.customer.first_name}"
+        return f"Order {self.id} by {self.customer.first_name or self.customer.email}"
 
     def save(self, *args, **kwargs):
-        # Проверка наличия товара на складе
-        stock = Stock.objects.get(product=self.product)
-        if self.quantity > stock.quantity:
-            raise ValidationError(f"Cannot order more than available stock: {stock.quantity}")
-        else:
-            # Уменьшаем количество на складе
-            stock.quantity -= self.quantity
-            stock.save()
+        # Проверка наличия товара на складе для каждого элемента корзины
+        cart_items = CartItem.objects.filter(cart=self.cart)
+        for item in cart_items:
+            stock = Stock.objects.get(product=item.product)
+            if item.quantity > stock.quantity:
+                raise ValidationError(f"Cannot order more than available stock: {stock.quantity}")
+            else:
+                # Уменьшаем количество на складе
+                stock.quantity -= item.quantity
+                stock.save()
 
         super(Order, self).save(*args, **kwargs)
-        # Создание записи в истории покупок
-        PurchaseHistory.objects.create(
-            customer=self.customer,
-            product=self.product,
-            quantity=self.quantity,
-            order=self,
-            purchase_date=self.delivery_date if self.delivery_date else self.order_date
-        )
+        # Создание записей в истории покупок для каждого элемента корзины
+        for item in cart_items:
+            PurchaseHistory.objects.create(
+                customer=self.customer,
+                product=item.product,
+                quantity=item.quantity,
+                order=self,
+                purchase_date=self.delivery_date if self.delivery_date else self.order_date
+            )
 
 
 class Category(models.Model):

@@ -58,10 +58,10 @@ logging.config.dictConfig(LOGGING)
 # env_logger = logging.getLogger('env_logger')
 env_logger = logging.getLogger(__name__)
 
-# env_logger.debug("Loaded environment variables:")
-# for key in env.ENVIRON:
-#     if key in ('DB_PASS', 'DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_URL', 'SECRET_KEY'):
-#         env_logger.debug(f"{key}={env.ENVIRON[key]}")
+env_logger.debug("Loaded environment variables:")
+for key in env.ENVIRON:
+    if key in ('DB_PASS', 'DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_URL', 'SECRET_KEY'):
+        env_logger.debug(f"{key}={env.ENVIRON[key]}")
 
 env_logger.debug(f"BASE_DIR={BASE_DIR}")
 env_logger.debug(f".env path={env_path}")

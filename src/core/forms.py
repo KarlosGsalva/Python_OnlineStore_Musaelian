@@ -17,15 +17,15 @@ class CartForm(forms.Form):
     #     fields = ["customer", "product", "quantity"]
 
 
-class OrderForm(forms.ModelForm):
-    name = forms.CharField()
-    adress = forms.CharField()
-    email = forms.EmailField()
-    cart = forms.ModelChoiceField(queryset=Cart.objects.all())
-
-    # class Meta:
-    #     model = Order
-    #     fields = ["customer", "product", "quantity", "status"]
+class OrderForm(forms.Form):
+    name = forms.CharField(label="Name", max_length=100)
+    address = forms.CharField(label="Address", max_length=255)
+    email = forms.EmailField(label="Email")
+    delivery_datetime = forms.DateTimeField(
+        label="Delivery Date and Time",
+        widget=forms.TextInput(attrs={'type': 'datetime-local'})
+    )
+    cart = forms.ModelChoiceField(queryset=Cart.objects.none(), label="Cart")
 
 
 class CustomerForm(forms.ModelForm):

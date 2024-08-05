@@ -1,12 +1,14 @@
 import logging
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.hashers import make_password
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
-from .forms import CartForm, CustomerForm, CustomerRegistrationForm
-from .models import Cart, Product, Customer
+
+
+from .forms import CartForm, CustomerForm, CustomerRegistrationForm, OrderForm
+from .models import Cart, Product, Customer, Order, CartItem, PurchaseHistory, Stock
 
 env_logger = logging.getLogger('env_logger')
 
@@ -69,6 +71,92 @@ def add_to_cart(request):
         form = CartForm()
 
     return render(request, 'add_to_cart.html', {'form': form})
+
+
+@login_required
+def place_order(request):
+    env_logger.debug("Entered place_order view")
+
+    if request.method == 'POST':
+        env_logger.debug("Request method is POST")
+
+        form = OrderForm(request.POST)
+        form.fields['cart'].queryset = Cart.objects.filter(customer=request.user)
+        if form.is_valid():
+            env_logger.debug("Form is valid")
+
+            name = form.cleaned_data['name']
+            address = form.cleaned_data['address']
+            delivery_datetime = form.cleaned_data['delivery_datetime']
+            email = form.cleaned_data['email']
+            cart = form.cleaned_data['cart']
+
+            env_logger.debug(
+                f"Name: {name}, Address: {address}, Email: {email}, Delivery Date and Time: {delivery_datetime}, Cart: {cart}")
+
+            try:
+                customer = Customer.objects.get(email=email)
+                env_logger.debug(f"Customer found: {customer}")
+            except Customer.DoesNotExist:
+                env_logger.error(f"Customer with email {email} does not exist")
+                return HttpResponse("Customer not found", status=404)
+
+            try:
+                # Проверка и обновление количества на складе для каждого элемента корзины
+                cart_items = CartItem.objects.filter(cart=cart)
+                for item in cart_items:
+                    stock = Stock.objects.get(product=item.product)
+                    if item.quantity > stock.quantity:
+                        env_logger.error(f"Cannot order more than available stock: {stock.quantity}")
+                        return HttpResponse(f"Cannot order more than available stock: {stock.quantity}", status=400)
+
+                # Уменьшаем количество на складе после всех проверок
+                for item in cart_items:
+                    stock = Stock.objects.get(product=item.product)
+                    stock.quantity -= item.quantity
+                    stock.save()
+                    env_logger.debug(f"Updated stock for product {item.product.name}: new quantity {stock.quantity}")
+
+                # Создаем заказ для выбранной корзины
+                order = Order.objects.create(
+                    customer=customer,
+                    cart=cart,
+                    delivery_datetime=delivery_datetime,
+                    status=Order.OrderStatus.PENDING
+                )
+                env_logger.debug(f"Order created: {order}")
+
+                # Создаем запись в истории покупок
+                for item in cart_items:
+                    PurchaseHistory.objects.create(
+                        customer=customer,
+                        product=item.product,
+                        quantity=item.quantity,
+                        order=order,
+                        purchase_date=order.order_date
+                    )
+                    env_logger.debug(f"Purchase history created for order {order.id}")
+
+                return redirect('order_success')
+            except ValidationError as e:
+                env_logger.error(f"Validation error: {e}")
+                return HttpResponse(f"Error: {e}", status=400)
+            except Exception as e:
+                env_logger.error(f"Unexpected error: {e}")
+                return HttpResponse(f"Error: {e}", status=500)
+        else:
+            env_logger.error("Form is not valid")
+            env_logger.debug(form.errors)
+    else:
+        env_logger.debug("Request method is not POST")
+        form = OrderForm()
+        form.fields['cart'].queryset = Cart.objects.filter(customer=request.user)
+
+    return render(request, 'place_order.html', {'form': form})
+
+
+def order_success(request):
+    return render(request, 'order_success.html')
 
 
 def create_customer(request):
