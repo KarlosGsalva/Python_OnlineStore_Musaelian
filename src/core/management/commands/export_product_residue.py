@@ -3,6 +3,7 @@ from django.core import serializers
 from core.models import Stock
 
 
+# "export_product_residue" command
 class Command(BaseCommand):
     help = 'Export product residue to a JSON file'
 

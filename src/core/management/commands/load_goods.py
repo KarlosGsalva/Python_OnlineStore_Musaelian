@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand
 from core.models import Product, Stock
 
 
+# "load_goods" command
 class Command(BaseCommand):
     help = 'Load goods from a JSON file'
 
