@@ -138,7 +138,7 @@ class Order(models.Model):
         COMPLETED = 'CL', 'Completed'  # заказ полностью выполнен и закрыт
 
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.SET_NULL, null=True, blank=True)
     order_date = models.DateTimeField(auto_now_add=True)
     delivery_datetime = models.DateTimeField(help_text="Date and time of delivery", default='01.01.2025')
     status = models.CharField(
