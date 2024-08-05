@@ -30,12 +30,6 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'env_debug.log'),
-            'formatter': 'simple',
-        },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -48,20 +42,26 @@ LOGGING = {
             'style': '{',
         },
     },
+    'loggers': {
+        'environ': {  # Настройка логгера для библиотеки environ
+            'handlers': ['console'],
+            'level': 'WARNING',  # WARNING, чтобы не показывать DEBUG сообщения
+            'propagate': False,
+        },
+    },
     'root': {
-        'handlers': ['file', 'console'],
+        'handlers': ['console'],
         'level': 'DEBUG',
     },
 }
 
 logging.config.dictConfig(LOGGING)
-# env_logger = logging.getLogger('env_logger')
 env_logger = logging.getLogger(__name__)
 
-env_logger.debug("Loaded environment variables:")
-for key in env.ENVIRON:
-    if key in ('DB_PASS', 'DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_URL', 'SECRET_KEY'):
-        env_logger.debug(f"{key}={env.ENVIRON[key]}")
+# env_logger.debug("Loaded environment variables:")
+# for key in env.ENVIRON:
+#     if key in ('DB_PASS', 'DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_URL', 'SECRET_KEY'):
+#         env_logger.debug(f"{key}={env.ENVIRON[key]}")
 
 env_logger.debug(f"BASE_DIR={BASE_DIR}")
 env_logger.debug(f".env path={env_path}")

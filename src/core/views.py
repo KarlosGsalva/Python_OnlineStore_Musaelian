@@ -37,12 +37,13 @@ def add_to_cart(request):
         env_logger.debug("Request method is POST")
 
         form = CartForm(request.POST)
+
         if form.is_valid():
             env_logger.debug("Form is valid")
 
-            user_email = request.user.email  # используем email текущего пользователя
+            user_email = request.user.email
             try:
-                customer = Customer.objects.get(email=user_email)  # получаем объект Customer по email
+                customer = Customer.objects.get(email=user_email)
             except Customer.DoesNotExist:
                 env_logger.error(f"Customer with email {user_email} does not exist")
                 return HttpResponse("Customer not found", status=404)
@@ -52,17 +53,27 @@ def add_to_cart(request):
 
             env_logger.debug(f"Customer: {customer}, Product: {product}, Quantity: {quantity}")
 
-            cart_item, created = Cart.objects.get_or_create(
-                customer=customer,
+            # Проверка на наличие существующей корзины для клиента
+            try:
+                cart = Cart.objects.get(customer=customer)
+            except Cart.DoesNotExist:
+                cart = Cart.objects.create(customer=customer)
+            except Cart.MultipleObjectsReturned:
+                cart = Cart.objects.filter(customer=customer).first()
+                Cart.objects.filter(customer=customer).exclude(id=cart.id).delete()
+
+            # Добавляем товар в корзину
+            cart_item, created = CartItem.objects.get_or_create(
+                cart=cart,
                 product=product,
                 defaults={'quantity': quantity}
             )
             if not created:
                 cart_item.quantity += quantity
-                cart_item.save()
+            cart_item.save()
             env_logger.debug(f"Cart item created: {created}, Quantity after update: {cart_item.quantity}")
 
-            return redirect('add_to_cart')  # замените на ваш URL успешного добавления
+            return redirect('add_to_cart')
         else:
             env_logger.error("Form is not valid")
             env_logger.debug(form.errors)
@@ -92,7 +103,11 @@ def place_order(request):
             cart = form.cleaned_data['cart']
 
             env_logger.debug(
-                f"Name: {name}, Address: {address}, Email: {email}, Delivery Date and Time: {delivery_datetime}, Cart: {cart}")
+                f"Name: {name}, "
+                f"Address: {address}, "
+                f"Email: {email}, "
+                f"Delivery Date and Time: {delivery_datetime}, "
+                f"Cart: {cart}")
 
             try:
                 customer = Customer.objects.get(email=email)
@@ -102,20 +117,17 @@ def place_order(request):
                 return HttpResponse("Customer not found", status=404)
 
             try:
+                env_logger.debug("Entering cart_items processing")
                 # Проверка и обновление количества на складе для каждого элемента корзины
                 cart_items = CartItem.objects.filter(cart=cart)
+                env_logger.debug(f"Cart items: {cart_items.count()} items found")
                 for item in cart_items:
+                    env_logger.debug(f"Processing item: {item.product.name}, Quantity: {item.quantity}")
                     stock = Stock.objects.get(product=item.product)
+                    env_logger.debug(f"Stock for {item.product.name}: {stock.quantity} available")
                     if item.quantity > stock.quantity:
                         env_logger.error(f"Cannot order more than available stock: {stock.quantity}")
                         return HttpResponse(f"Cannot order more than available stock: {stock.quantity}", status=400)
-
-                # Уменьшаем количество на складе после всех проверок
-                for item in cart_items:
-                    stock = Stock.objects.get(product=item.product)
-                    stock.quantity -= item.quantity
-                    stock.save()
-                    env_logger.debug(f"Updated stock for product {item.product.name}: new quantity {stock.quantity}")
 
                 # Создаем заказ для выбранной корзины
                 order = Order.objects.create(
@@ -126,17 +138,21 @@ def place_order(request):
                 )
                 env_logger.debug(f"Order created: {order}")
 
-                # Создаем запись в истории покупок
+                # Уменьшаем количество на складе после создания заказа
                 for item in cart_items:
-                    PurchaseHistory.objects.create(
-                        customer=customer,
-                        product=item.product,
-                        quantity=item.quantity,
-                        order=order,
-                        purchase_date=order.order_date
-                    )
-                    env_logger.debug(f"Purchase history created for order {order.id}")
+                    stock = Stock.objects.get(product=item.product)
+                    stock.quantity -= item.quantity
+                    stock.save()
+                    env_logger.debug(f"Updated stock for product {item.product.name}: new quantity {stock.quantity}")
 
+                # Обновляем статус заказа на "PROCESSING"
+                order.status = Order.OrderStatus.PROCESSING
+                order.save()
+                env_logger.debug(f"Order status updated to PROCESSING for order {order.id}")
+
+                # Удаляем корзину
+                cart.delete()
+                env_logger.debug(f"Cart deleted for customer: {customer}")
                 return redirect('order_success')
             except ValidationError as e:
                 env_logger.error(f"Validation error: {e}")
@@ -165,7 +181,6 @@ def create_customer(request):
         if form.is_valid():
             form.save()
             return redirect('customer_list')
-            # Перенаправление на список клиентов после создания
     else:
         form = CustomerForm()
     return render(request, 'create_customer.html', {'form': form})
@@ -178,7 +193,6 @@ def edit_customer(request, pk):
         if form.is_valid():
             form.save()
             return redirect('customer_list')
-            # Перенаправление на список клиентов после редактирования
     else:
         form = CustomerForm(instance=customer)
     return render(request, 'customer_form.html', {'form': form})

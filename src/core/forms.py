@@ -12,10 +12,6 @@ class CartForm(forms.Form):
     quantity = forms.IntegerField(min_value=1, error_messages={'required': 'Please enter a quantity',
                                                                'min_value': 'Quantity must be at least 1'})
 
-    # class Meta:
-    #     model = Cart
-    #     fields = ["customer", "product", "quantity"]
-
 
 class OrderForm(forms.Form):
     name = forms.CharField(label="Name", max_length=100)

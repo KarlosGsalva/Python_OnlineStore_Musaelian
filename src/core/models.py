@@ -101,8 +101,7 @@ class Stock(models.Model):
 
 class Cart(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "cart"
@@ -117,6 +116,11 @@ class CartItem(models.Model):
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE)
     product = models.ForeignKey('Product', on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
+
+    class Meta:
+        db_table = "cart_item"
+        verbose_name = "cart item"
+        verbose_name_plural = "cart items"
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name} in cart {self.cart.id}"
@@ -156,10 +160,6 @@ class Order(models.Model):
             stock = Stock.objects.get(product=item.product)
             if item.quantity > stock.quantity:
                 raise ValidationError(f"Cannot order more than available stock: {stock.quantity}")
-            else:
-                # Уменьшаем количество на складе
-                stock.quantity -= item.quantity
-                stock.save()
 
         super(Order, self).save(*args, **kwargs)
         # Создание записей в истории покупок для каждого элемента корзины
@@ -169,7 +169,7 @@ class Order(models.Model):
                 product=item.product,
                 quantity=item.quantity,
                 order=self,
-                purchase_date=self.delivery_date if self.delivery_date else self.order_date
+                purchase_date=self.delivery_datetime if self.delivery_datetime else self.order_date
             )
 
 
