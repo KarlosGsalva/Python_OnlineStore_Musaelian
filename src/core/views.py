@@ -7,7 +7,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 
 
-from .forms import CartForm, CustomerForm, CustomerRegistrationForm, OrderForm, RemoveCartItemForm
+from .forms import (
+    CartForm,
+    CustomerForm,
+    CustomerRegistrationForm,
+    OrderForm,
+    RemoveCartItemForm,
+)
 from .models import Cart, Product, Customer, Order, CartItem, PurchaseHistory, Stock
 
 env_logger = logging.getLogger("env_logger")
@@ -235,30 +241,28 @@ def view_cart(request):
     cart_items = CartItem.objects.filter(cart=cart)
     remove_form = RemoveCartItemForm()
 
-    if request.method == 'POST':
+    if request.method == "POST":
         remove_form = RemoveCartItemForm(request.POST)
         if remove_form.is_valid():
-            cart_item_id = remove_form.cleaned_data['cart_item_id']
+            cart_item_id = remove_form.cleaned_data["cart_item_id"]
             cart_item = get_object_or_404(CartItem, id=cart_item_id)
             cart_item.delete()
-            return redirect('view_cart')
+            return redirect("view_cart")
 
-    context = {
-        'cart': cart,
-        'cart_items': cart_items,
-        'remove_form': remove_form
-    }
-    return render(request, 'view_cart.html', context)
+    context = {"cart": cart, "cart_items": cart_items, "remove_form": remove_form}
+    return render(request, "view_cart.html", context)
 
 
 @login_required
 def view_purchase_history(request):
-    purchase_history = PurchaseHistory.objects.filter(customer=request.user).order_by('-purchase_date')
-    env_logger.debug(f"Retrieved {purchase_history.count()} purchase history records for user {request.user.email}")
+    purchase_history = PurchaseHistory.objects.filter(customer=request.user).order_by(
+        "-purchase_date"
+    )
+    env_logger.debug(
+        f"Retrieved {purchase_history.count()} purchase history records for user {request.user.email}"
+    )
     for purchase in purchase_history:
         env_logger.debug(f"Purchase: {purchase}")
 
-    context = {
-        'purchase_history': purchase_history
-    }
-    return render(request, 'view_purchase_history.html', context)
+    context = {"purchase_history": purchase_history}
+    return render(request, "view_purchase_history.html", context)

@@ -34,6 +34,6 @@ urlpatterns = [
     path("customers/<int:pk>/edit/", edit_customer, name="edit_customer"),
     path("place_order/", place_order, name="place_order"),
     path("order_success/", order_success, name="order_success"),
-    path('view_cart/', view_cart, name='view_cart'),
-    path('purchase_history/', view_purchase_history, name='view_purchase_history'),
+    path("view_cart/", view_cart, name="view_cart"),
+    path("purchase_history/", view_purchase_history, name="view_purchase_history"),
 ]
