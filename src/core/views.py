@@ -8,7 +8,7 @@ from django.contrib.auth import login, authenticate
 
 
 from .forms import CartForm, CustomerForm, CustomerRegistrationForm, OrderForm
-from .models import Cart, Product, Customer, Order, CartItem, PurchaseHistory, Stock
+from .models import Cart, Product, Customer, Order, CartItem, Stock
 
 env_logger = logging.getLogger("env_logger")
 

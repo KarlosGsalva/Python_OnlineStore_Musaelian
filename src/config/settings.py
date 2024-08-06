@@ -10,9 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-import logging
 import logging.config
-import os
 from pathlib import Path
 import environ
 from environ import ImproperlyConfigured
@@ -44,9 +42,9 @@ LOGGING = {
         },
     },
     "loggers": {
-        "environ": {  # Настройка логгера для библиотеки environ
+        "environ": {
             "handlers": ["console"],
-            "level": "WARNING",  # WARNING, чтобы не показывать DEBUG сообщения
+            "level": "WARNING",
             "propagate": False,
         },
     },
@@ -58,11 +56,6 @@ LOGGING = {
 
 logging.config.dictConfig(LOGGING)
 env_logger = logging.getLogger(__name__)
-
-# env_logger.debug("Loaded environment variables:")
-# for key in env.ENVIRON:
-#     if key in ('DB_PASS', 'DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_URL', 'SECRET_KEY'):
-#         env_logger.debug(f"{key}={env.ENVIRON[key]}")
 
 env_logger.debug(f"BASE_DIR={BASE_DIR}")
 env_logger.debug(f".env path={env_path}")
