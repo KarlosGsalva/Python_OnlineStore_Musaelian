@@ -6,35 +6,37 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0010_alter_order_delivery_datetime'),
+        ("core", "0010_alter_order_delivery_datetime"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='cartitem',
-            options={'verbose_name': 'cart item', 'verbose_name_plural': 'cart items'},
+            name="cartitem",
+            options={"verbose_name": "cart item", "verbose_name_plural": "cart items"},
         ),
         migrations.RemoveField(
-            model_name='cart',
-            name='product',
+            model_name="cart",
+            name="product",
         ),
         migrations.RemoveField(
-            model_name='cart',
-            name='quantity',
+            model_name="cart",
+            name="quantity",
         ),
         migrations.AddField(
-            model_name='cart',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, default='2024-01-01'),
+            model_name="cart",
+            name="created_at",
+            field=models.DateTimeField(auto_now_add=True, default="2024-01-01"),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='order',
-            name='delivery_datetime',
-            field=models.DateTimeField(default='01.01.2025', help_text='Date and time of delivery'),
+            model_name="order",
+            name="delivery_datetime",
+            field=models.DateTimeField(
+                default="01.01.2025", help_text="Date and time of delivery"
+            ),
         ),
         migrations.AlterModelTable(
-            name='cartitem',
-            table='cart_item',
+            name="cartitem",
+            table="cart_item",
         ),
     ]

@@ -10,7 +10,7 @@ from django import forms
 class CustomerManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
-            raise ValueError('The Email field must be set')
+            raise ValueError("The Email field must be set")
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
@@ -18,8 +18,8 @@ class CustomerManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
 
         return self.create_user(email, password, **extra_fields)
 
@@ -38,23 +38,23 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
 
     groups = models.ManyToManyField(
-        'auth.Group',
-        related_name='customer_users',
+        "auth.Group",
+        related_name="customer_users",
         blank=True,
-        help_text='The groups this user belongs to.',
-        verbose_name='groups',
+        help_text="The groups this user belongs to.",
+        verbose_name="groups",
     )
     user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        related_name='customer_user_permissions',
+        "auth.Permission",
+        related_name="customer_user_permissions",
         blank=True,
-        help_text='Specific permissions for this user.',
-        verbose_name='user permissions',
+        help_text="Specific permissions for this user.",
+        verbose_name="user permissions",
     )
 
     objects = CustomerManager()
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     class Meta:
@@ -70,8 +70,10 @@ class Product(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.ImageField(upload_to='product_images/', null=True, blank=True)
-    category = models.ForeignKey('Category', on_delete=models.PROTECT, null=True, blank=True)
+    image = models.ImageField(upload_to="product_images/", null=True, blank=True)
+    category = models.ForeignKey(
+        "Category", on_delete=models.PROTECT, null=True, blank=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -113,8 +115,8 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
-    cart = models.ForeignKey('Cart', on_delete=models.CASCADE)
-    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    cart = models.ForeignKey("Cart", on_delete=models.CASCADE)
+    product = models.ForeignKey("Product", on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
 
     class Meta:
@@ -128,19 +130,21 @@ class CartItem(models.Model):
 
 class Order(models.Model):
     class OrderStatus(models.TextChoices):
-        PENDING = 'PD', 'Pending'  # заказ создан, но еще не обработан
-        PROCESSING = 'PR', 'Processing'  # заказ обрабатывается
-        AWAIT_PAYMENT = 'PA', 'Payment'  # заказ создан, но ожидается оплата
-        SHIPPED = 'SH', 'Shipped'  # заказ отправлен клиенту
-        DELIVERED = 'DL', 'Delivered'  # заказ доставлен клиенту
-        CANCELED = 'CC', 'Canceled'  # заказ отменен
-        RETURNED = 'RT', 'Returned'  # заказ возвращен клиентом
-        COMPLETED = 'CL', 'Completed'  # заказ полностью выполнен и закрыт
+        PENDING = "PD", "Pending"  # заказ создан, но еще не обработан
+        PROCESSING = "PR", "Processing"  # заказ обрабатывается
+        AWAIT_PAYMENT = "PA", "Payment"  # заказ создан, но ожидается оплата
+        SHIPPED = "SH", "Shipped"  # заказ отправлен клиенту
+        DELIVERED = "DL", "Delivered"  # заказ доставлен клиенту
+        CANCELED = "CC", "Canceled"  # заказ отменен
+        RETURNED = "RT", "Returned"  # заказ возвращен клиентом
+        COMPLETED = "CL", "Completed"  # заказ полностью выполнен и закрыт
 
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     cart = models.ForeignKey(Cart, on_delete=models.SET_NULL, null=True, blank=True)
     order_date = models.DateTimeField(auto_now_add=True)
-    delivery_datetime = models.DateTimeField(help_text="Date and time of delivery", default='01.01.2025')
+    delivery_datetime = models.DateTimeField(
+        help_text="Date and time of delivery", default="01.01.2025"
+    )
     status = models.CharField(
         max_length=8, choices=OrderStatus.choices, default=OrderStatus.PENDING
     )
@@ -159,7 +163,9 @@ class Order(models.Model):
         for item in cart_items:
             stock = Stock.objects.get(product=item.product)
             if item.quantity > stock.quantity:
-                raise ValidationError(f"Cannot order more than available stock: {stock.quantity}")
+                raise ValidationError(
+                    f"Cannot order more than available stock: {stock.quantity}"
+                )
 
         super(Order, self).save(*args, **kwargs)
         # Создание записей в истории покупок для каждого элемента корзины
@@ -169,7 +175,11 @@ class Order(models.Model):
                 product=item.product,
                 quantity=item.quantity,
                 order=self,
-                purchase_date=self.delivery_datetime if self.delivery_datetime else self.order_date
+                purchase_date=(
+                    self.delivery_datetime
+                    if self.delivery_datetime
+                    else self.order_date
+                ),
             )
 
 

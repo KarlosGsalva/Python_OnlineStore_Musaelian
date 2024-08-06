@@ -11,124 +11,276 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('auth', '0012_alter_user_first_name_max_length'),
+        ("auth", "0012_alter_user_first_name_max_length"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Category',
+            name="Category",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
             ],
             options={
-                'verbose_name': 'categories',
-                'verbose_name_plural': 'categories',
-                'db_table': 'categories',
+                "verbose_name": "categories",
+                "verbose_name_plural": "categories",
+                "db_table": "categories",
             },
         ),
         migrations.CreateModel(
-            name='Customer',
+            name="Customer",
             fields=[
-                ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('first_name', models.CharField(blank=True, max_length=50, null=True)),
-                ('last_name', models.CharField(blank=True, max_length=50, null=True)),
-                ('email', models.EmailField(blank=True, max_length=50, null=True, unique=True)),
-                ('address', models.TextField(blank=True, null=True)),
-                ('contact_info', models.TextField(blank=True, null=True)),
-                ('password', models.CharField()),
-                ('date_joined', models.DateTimeField(auto_now_add=True)),
-                ('last_login', models.DateTimeField(blank=True, null=True)),
-                ('is_staff', models.BooleanField(default=False)),
-                ('is_active', models.BooleanField(default=True)),
-                ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to.', related_name='customer_users', to='auth.group', verbose_name='groups')),
-                ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='customer_user_permissions', to='auth.permission', verbose_name='user permissions')),
+                (
+                    "is_superuser",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Designates that this user has all permissions without explicitly assigning them.",
+                        verbose_name="superuser status",
+                    ),
+                ),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("first_name", models.CharField(blank=True, max_length=50, null=True)),
+                ("last_name", models.CharField(blank=True, max_length=50, null=True)),
+                (
+                    "email",
+                    models.EmailField(
+                        blank=True, max_length=50, null=True, unique=True
+                    ),
+                ),
+                ("address", models.TextField(blank=True, null=True)),
+                ("contact_info", models.TextField(blank=True, null=True)),
+                ("password", models.CharField()),
+                ("date_joined", models.DateTimeField(auto_now_add=True)),
+                ("last_login", models.DateTimeField(blank=True, null=True)),
+                ("is_staff", models.BooleanField(default=False)),
+                ("is_active", models.BooleanField(default=True)),
+                (
+                    "groups",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="The groups this user belongs to.",
+                        related_name="customer_users",
+                        to="auth.group",
+                        verbose_name="groups",
+                    ),
+                ),
+                (
+                    "user_permissions",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="Specific permissions for this user.",
+                        related_name="customer_user_permissions",
+                        to="auth.permission",
+                        verbose_name="user permissions",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'customers',
-                'verbose_name_plural': 'customers',
-                'db_table': 'customers',
+                "verbose_name": "customers",
+                "verbose_name_plural": "customers",
+                "db_table": "customers",
             },
         ),
         migrations.CreateModel(
-            name='Product',
+            name="Product",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('description', models.TextField()),
-                ('price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('image', models.ImageField(upload_to='product_images/')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('category', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='core.category')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("description", models.TextField()),
+                ("price", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("image", models.ImageField(upload_to="product_images/")),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "category",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="core.category",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'products',
-                'verbose_name_plural': 'products',
-                'db_table': 'products',
+                "verbose_name": "products",
+                "verbose_name_plural": "products",
+                "db_table": "products",
             },
         ),
         migrations.CreateModel(
-            name='Order',
+            name="Order",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('quantity', models.PositiveIntegerField()),
-                ('order_date', models.DateTimeField(auto_now_add=True)),
-                ('delivery_date', models.DateTimeField(blank=True, null=True)),
-                ('status', models.CharField(choices=[('PD', 'Pending'), ('PR', 'Processing'), ('PA', 'Payment'), ('SH', 'Shipped'), ('DL', 'Delivered'), ('CC', 'Canceled'), ('RT', 'Returned'), ('CL', 'Completed')], default='PD', max_length=8)),
-                ('customer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.product')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("quantity", models.PositiveIntegerField()),
+                ("order_date", models.DateTimeField(auto_now_add=True)),
+                ("delivery_date", models.DateTimeField(blank=True, null=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("PD", "Pending"),
+                            ("PR", "Processing"),
+                            ("PA", "Payment"),
+                            ("SH", "Shipped"),
+                            ("DL", "Delivered"),
+                            ("CC", "Canceled"),
+                            ("RT", "Returned"),
+                            ("CL", "Completed"),
+                        ],
+                        default="PD",
+                        max_length=8,
+                    ),
+                ),
+                (
+                    "customer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "product",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.product"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'orders',
-                'verbose_name_plural': 'orders',
-                'db_table': 'orders',
+                "verbose_name": "orders",
+                "verbose_name_plural": "orders",
+                "db_table": "orders",
             },
         ),
         migrations.CreateModel(
-            name='Cart',
+            name="Cart",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('quantity', models.PositiveIntegerField()),
-                ('customer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.product')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("quantity", models.PositiveIntegerField()),
+                (
+                    "customer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "product",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.product"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'cart',
-                'verbose_name_plural': 'cart',
-                'db_table': 'cart',
+                "verbose_name": "cart",
+                "verbose_name_plural": "cart",
+                "db_table": "cart",
             },
         ),
         migrations.CreateModel(
-            name='PurchaseHistory',
+            name="PurchaseHistory",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('quantity', models.PositiveIntegerField()),
-                ('purchase_date', models.DateTimeField()),
-                ('customer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('order', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.order')),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.product')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("quantity", models.PositiveIntegerField()),
+                ("purchase_date", models.DateTimeField()),
+                (
+                    "customer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "order",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.order"
+                    ),
+                ),
+                (
+                    "product",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.product"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'purchase_history',
-                'verbose_name_plural': 'purchase_histories',
-                'db_table': 'purchase_history',
+                "verbose_name": "purchase_history",
+                "verbose_name_plural": "purchase_histories",
+                "db_table": "purchase_history",
             },
         ),
         migrations.CreateModel(
-            name='Stock',
+            name="Stock",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('quantity', models.PositiveIntegerField()),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.product')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("quantity", models.PositiveIntegerField()),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "product",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="core.product"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'stock',
-                'verbose_name_plural': 'stock',
-                'db_table': 'stock',
+                "verbose_name": "stock",
+                "verbose_name_plural": "stock",
+                "db_table": "stock",
             },
         ),
     ]

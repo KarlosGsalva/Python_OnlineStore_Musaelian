@@ -7,22 +7,24 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0004_cartitem'),
+        ("core", "0004_cartitem"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='order',
-            name='product',
+            model_name="order",
+            name="product",
         ),
         migrations.RemoveField(
-            model_name='order',
-            name='quantity',
+            model_name="order",
+            name="quantity",
         ),
         migrations.AddField(
-            model_name='order',
-            name='cart',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='core.cart'),
+            model_name="order",
+            name="cart",
+            field=models.ForeignKey(
+                default=1, on_delete=django.db.models.deletion.CASCADE, to="core.cart"
+            ),
             preserve_default=False,
         ),
     ]

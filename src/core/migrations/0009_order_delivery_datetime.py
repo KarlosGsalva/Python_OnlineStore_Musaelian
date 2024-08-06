@@ -6,14 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0008_remove_order_delivery_datetime'),
+        ("core", "0008_remove_order_delivery_datetime"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='order',
-            name='delivery_datetime',
-            field=models.DateTimeField(default='2024-01-01', help_text='Date and time of delivery'),
+            model_name="order",
+            name="delivery_datetime",
+            field=models.DateTimeField(
+                default="2024-01-01", help_text="Date and time of delivery"
+            ),
             preserve_default=False,
         ),
     ]

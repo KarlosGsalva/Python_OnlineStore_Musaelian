@@ -7,13 +7,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0011_alter_cartitem_options_remove_cart_product_and_more'),
+        ("core", "0011_alter_cartitem_options_remove_cart_product_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='order',
-            name='cart',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='core.cart'),
+            model_name="order",
+            name="cart",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="core.cart",
+            ),
         ),
     ]
