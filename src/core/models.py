@@ -29,7 +29,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=50, null=True, blank=True)
     last_name = models.CharField(max_length=50, null=True, blank=True)
-    email = models.EmailField(max_length=50, unique=True, null=True, blank=True)
+    email = models.EmailField(max_length=100, unique=True, null=True, blank=True)
     address = models.TextField(null=True, blank=True)
     contact_info = models.TextField(null=True, blank=True)
     password = models.CharField()
