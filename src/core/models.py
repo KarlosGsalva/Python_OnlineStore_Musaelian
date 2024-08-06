@@ -5,6 +5,7 @@ from django.contrib.auth.models import PermissionsMixin
 from django.core.exceptions import ValidationError
 from django.db import models
 from django import forms
+from django.utils import timezone
 
 
 class CustomerManager(BaseUserManager):
@@ -143,7 +144,7 @@ class Order(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.SET_NULL, null=True, blank=True)
     order_date = models.DateTimeField(auto_now_add=True)
     delivery_datetime = models.DateTimeField(
-        help_text="Date and time of delivery", default="01.01.2025"
+        help_text="Date and time of delivery", default=timezone.now
     )
     status = models.CharField(
         max_length=8, choices=OrderStatus.choices, default=OrderStatus.PENDING
