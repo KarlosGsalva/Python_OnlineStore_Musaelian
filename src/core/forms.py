@@ -37,22 +37,8 @@ class CustomerForm(forms.ModelForm):
         fields = ["first_name", "last_name", "address", "contact_info"]
 
 
-class ProductForm(forms.ModelForm):
-    class Meta:
-        model = Product
-        fields = ["name", "description", "price", "image", "category"]
-
-
-class StockForm(forms.ModelForm):
-    class Meta:
-        model = Stock
-        fields = ["product", "quantity"]
-
-
-class CategoryForm(forms.ModelForm):
-    class Meta:
-        model = Category
-        fields = ["name"]
+class RemoveCartItemForm(forms.Form):
+    cart_item_id = forms.IntegerField(widget=forms.HiddenInput)
 
 
 class CustomerRegistrationForm(forms.ModelForm):

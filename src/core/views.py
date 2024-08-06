@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 
 
-from .forms import CartForm, CustomerForm, CustomerRegistrationForm, OrderForm
+from .forms import CartForm, CustomerForm, CustomerRegistrationForm, OrderForm, RemoveCartItemForm
 from .models import Cart, Product, Customer, Order, CartItem, PurchaseHistory, Stock
 
 env_logger = logging.getLogger("env_logger")
@@ -75,7 +75,7 @@ def add_to_cart(request):
                 f"Cart item created: {created}, Quantity after update: {cart_item.quantity}"
             )
 
-            return redirect("add_to_cart")
+            return redirect("view_cart")
         else:
             env_logger.error("Form is not valid")
             env_logger.debug(form.errors)
@@ -227,3 +227,38 @@ def register(request):
     else:
         form = CustomerRegistrationForm()
     return render(request, "register.html", {"form": form})
+
+
+@login_required
+def view_cart(request):
+    cart = get_object_or_404(Cart, customer=request.user)
+    cart_items = CartItem.objects.filter(cart=cart)
+    remove_form = RemoveCartItemForm()
+
+    if request.method == 'POST':
+        remove_form = RemoveCartItemForm(request.POST)
+        if remove_form.is_valid():
+            cart_item_id = remove_form.cleaned_data['cart_item_id']
+            cart_item = get_object_or_404(CartItem, id=cart_item_id)
+            cart_item.delete()
+            return redirect('view_cart')
+
+    context = {
+        'cart': cart,
+        'cart_items': cart_items,
+        'remove_form': remove_form
+    }
+    return render(request, 'view_cart.html', context)
+
+
+@login_required
+def view_purchase_history(request):
+    purchase_history = PurchaseHistory.objects.filter(customer=request.user).order_by('-purchase_date')
+    env_logger.debug(f"Retrieved {purchase_history.count()} purchase history records for user {request.user.email}")
+    for purchase in purchase_history:
+        env_logger.debug(f"Purchase: {purchase}")
+
+    context = {
+        'purchase_history': purchase_history
+    }
+    return render(request, 'view_purchase_history.html', context)
