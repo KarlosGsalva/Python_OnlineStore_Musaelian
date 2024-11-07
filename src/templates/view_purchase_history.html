@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Purchase History{% endblock %}
+
+{% block content %}
+<h2>Purchase History</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Order</th>
+            <th>Purchase Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for purchase in purchase_history %}
+        <tr>
+            <td>{{ purchase.product.name }}</td>
+            <td>{{ purchase.quantity }}</td>
+            <td>{{ purchase.order.id }}</td>
+            <td>{{ purchase.purchase_date }}</td>
+        </tr>
+        {% endfor %}
+        {% if not purchase_history %}
+        <tr>
+            <td colspan="4">No purchases found.</td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endblock %}

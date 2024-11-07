@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Potatos",
+        "description": "Potatos 1 kg",
+        "price": "3.00",
+        "quantity": 100
+    },
+    {
+        "name": "Milk",
+        "description": "1 pack",
+        "price": "4.00",
+        "quantity": 50
+    }
+]

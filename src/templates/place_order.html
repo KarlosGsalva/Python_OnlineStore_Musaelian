@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Place Order{% endblock %}
+
+{% block content %}
+  <h2>Place Order</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div class="form-group">
+      {{ form.name.label_tag }} {{ form.name }}
+      {{ form.name.errors }}
+    </div>
+    <br>
+    <div class="form-group">
+      {{ form.address.label_tag }} {{ form.address }}
+      {{ form.address.errors }}
+    </div>
+    <br>
+    <div class="form-group">
+      {{ form.email.label_tag }} {{ form.email }}
+      {{ form.email.errors }}
+    </div>
+    <br>
+    <div class="form-group">
+      {{ form.delivery_datetime.label_tag }} {{ form.delivery_datetime }}
+      {{ form.delivery_datetime.errors }}
+    </div>
+    <br>
+    <div class="form-group">
+      {{ form.cart.label_tag }} {{ form.cart }}
+      {{ form.cart.errors }}
+    </div>
+    <br>
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        <ul>
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary">Place Order</button>
+  </form>
+{% endblock %}
